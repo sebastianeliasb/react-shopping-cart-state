@@ -4,6 +4,18 @@ import Home from "./pages/Home";
 
 import * as api from "./api";
 
+function newCartComponent(product) {
+  return {
+    id: product.id,
+    title: product.title,
+    img: product.img,
+    price: product.price,
+    unitsInStock: product.unitsInStock,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+    quantity: product.quantity + 1,
+  };
+}
 class App extends Component {
   constructor(props) {
     super(props);
@@ -15,6 +27,7 @@ class App extends Component {
       hasError: false,
       loadingError: null,
     };
+    this.handleAddToCart = this.handleAddToCart.bind(this);
   }
 
   componentDidMount() {
@@ -30,8 +43,29 @@ class App extends Component {
     });
   }
 
-  // handleAddToCart(productId) {}
+  handleAddToCart(productId) {
+    const { cartItems, products } = this.state;
 
+    const index = products.findIndex((x) => x.id === productId);
+    const element = cartItems.find((x) => x.id === productId);
+
+    if (element) {
+      const updatedInfo = cartItems.map((item) => {
+        if (item.id !== productId) {
+          return item;
+        }
+        return { ...item, quantity: item.quantity + 1 };
+      });
+
+      this.setState({ cartItems: updatedInfo });
+      return;
+    }
+
+    const updatedInfo = newCartComponent(products[index]);
+    this.setState((prevstate) => ({
+      cartItems: [...prevstate.cartItems, updatedInfo],
+    }));
+  }
   // handleChange(event, productId) {}
 
   // handleRemove(productId) {}
@@ -61,7 +95,7 @@ class App extends Component {
         handleDownVote={() => {}}
         handleUpVote={() => {}}
         handleSetFavorite={() => {}}
-        handleAddToCart={() => {}}
+        handleAddToCart={this.handleAddToCart}
         handleRemove={() => {}}
         handleChange={() => {}}
       />
